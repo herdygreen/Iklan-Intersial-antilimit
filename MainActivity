@@ -1,0 +1,77 @@
+
+public class MainActivity extends AppCompatActivity {
+
+    Button next_button;;
+    private AdView mAdView;
+
+    private InterstitialAd mInterstitialAd;
+    private int counter = 0;
+    private int interpal = 2;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        
+        setAds();
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+            }
+        });
+
+
+        //menu1
+        menu1 =findViewById(R.id.menu1);
+        menu1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (counter>=interpal){
+                        if (mInterstitialAd != null) {
+                            startActivity(new Intent(MainActivity.this,Menu2.class));
+                            counter=0;
+                            mInterstitialAd.show(MainActivity.this);
+                            mInterstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
+                                @Override
+                                public void onAdDismissedFullScreenContent() {
+                                    super.onAdDismissedFullScreenContent();
+                                    mInterstitialAd = null;
+                                    setAds();
+                                }
+                            });
+                        } else {
+                            Toast.makeText(MainActivity.this, "Coba Lagi - Wait 5 Seconds-load ads", Toast.LENGTH_SHORT).show();
+                        }
+                    }else {
+                        counter++;
+                        startActivity(new Intent(MainActivity.this,Menu2.class));
+            }
+        });
+
+
+
+
+///------
+    public void setAds(){
+
+        if(interpal>=1) {
+            AdRequest adRequest = new AdRequest.Builder().build();
+            InterstitialAd.load(this, getString(R.string.intersial), adRequest, new InterstitialAdLoadCallback() {
+                @Override
+                public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                    // The mInterstitialAd reference will be null until
+                    // an ad is loaded.
+                    mInterstitialAd = interstitialAd;
+
+                }
+
+                @Override
+                public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                    // Handle the error
+                    mInterstitialAd = null;
+                }
+            });
+        }
+    }
+
+}
